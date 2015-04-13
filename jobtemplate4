@@ -1,0 +1,41 @@
+#!/bin/tcsh -x
+
+source $VO_CMS_SW_DIR/cmsset_default.csh
+source /afs/cern.ch/cms/caf/setup.csh
+
+set me = `whoami`
+
+cd /tmp/${me}/
+mkdir ----RUN-NUMBER----
+cd ----RUN-NUMBER----
+project CMSSW
+cmsrel ----RELEASE----
+cd ----RELEASE----/src
+
+eval `scramv1 runtime -csh`
+mkdir UserCode/
+cd UserCode/
+mkdir Aocampor/
+cd ..
+cvs co UserCode/Aocampor/RPCTriggerNoise
+cd UserCode/Aocampor/
+cp -r RPCTriggerNoise/ ..
+cd ..
+cd RPCTriggerNoise/
+scram b 
+#cd UserCode/
+#cp -r /afs/cern.ch/user/a/aocampor/public/RPCTriggerNoise .
+#scramv1 b
+
+cd /tmp/${me}/----RUN-NUMBER----/----RELEASE----/src
+cp $HOME/scratch0/----RUN-NUMBER----/python/----input_file---- /tmp/${me}/----RUN-NUMBER----/----RELEASE----/src
+
+EdmPluginRefresh
+
+rm ----input_file----.out
+cmsRun ----input_file---- > ----input_file----.out
+cmsStageOut ----input_file----.out /store/caf/user/ccmuon/RPC/GlobalRuns/----DATASET----/----RUN-NUMBER----/out/
+cmsStageOut ----output_file---- /store/caf/user/ccmuon/RPC/GlobalRuns/----DATASET----/----RUN-NUMBER----/noise/
+rfchmod +777 /castor/cern.ch/cms/store/caf/user/ccmuon/RPC/GlobalRuns/----DATASET----/----RUN-NUMBER----/noise/----output_file----
+
+exit 0

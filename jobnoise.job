@@ -1,0 +1,29 @@
+#!/bin/tcsh -x
+
+### Set CMSSW environment ###
+
+
+## generic ##
+# if ( ! ${?VO_CMS_SW_DIR} ) then
+#   setenv VO_CMS_SW_DIR /afs/cern.ch/cms/sw
+# endif
+source $VO_CMS_SW_DIR/cmsset_default.csh
+
+set me = `whoami`
+cd  /tmp/${me}
+mkdir ----RUN-NUMBER----
+cd ----RUN-NUMBER----
+project CMSSW
+cmsrel ----RELEASE----
+cd ----RELEASE----/src
+
+eval `scramv1 runtime -csh`
+
+cd ----WORKING-ORT----
+./noisemacro.py ----DATA-SET---- ----RUN-NUMBER----
+set data = "----DATA-SET----"
+set da1 = `echo $data | awk -F "/" '{print $2}'`
+set da2 = `echo $data | awk -F "/" '{print $3}'`
+set da3 = `echo $data | awk -F "/" '{print $4}'`
+set dat = ${da1}${da2}${da3}
+rfcp RPCNoiseout_----RUN-NUMBER----.root /castor/cern.ch/user/c/ccmuon/RPC/GlobalRuns/${dat}/----RUN-NUMBER----/noise

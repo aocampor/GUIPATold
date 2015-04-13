@@ -1,0 +1,36 @@
+#!/bin/tcsh -x
+
+
+### Set CMSSW environment ###
+
+
+## generic ##
+# if ( ! ${?VO_CMS_SW_DIR} ) then
+#   setenv VO_CMS_SW_DIR /afs/cern.ch/cms/sw
+# endif
+source $VO_CMS_SW_DIR/cmsset_default.csh
+source /afs/cern.ch/cms/caf/setup.csh
+
+## CVS ##
+# alias cmscvsroot 'source $CMS_PATH/utils/cmscvsroot.csh'
+# alias project 'source $CMS_PATH/utils/projch.csh'
+# cmscvsroot CMSSW
+
+set me = `whoami`
+
+cd /tmp/${me}/
+mkdir ----RUN-NUMBER----
+cd ----RUN-NUMBER----
+
+project CMSSW
+cmsrel CMSSW_3_1_0
+cd CMSSW_3_1_0/src
+
+eval `scramv1 ru -csh` 
+
+cd /tmp/${me}/----RUN-NUMBER----/CMSSW_3_1_0/src
+
+EdmPluginRefresh
+setenv STAGE_SVCCLASS cmscaf
+
+cd /tmp/${me}/----RUN-NUMBER----/

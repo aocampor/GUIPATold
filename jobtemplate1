@@ -1,0 +1,34 @@
+#!/bin/tcsh -x
+
+source $VO_CMS_SW_DIR/cmsset_default.csh
+source /afs/cern.ch/cms/caf/setup.csh
+
+set me = `whoami`
+
+cd /tmp/${me}/
+mkdir ----RUN-NUMBER----
+cd ----RUN-NUMBER----
+project CMSSW
+cmsrel ----RELEASE----
+cd ----RELEASE----/src
+
+eval `scramv1 runtime -csh`
+
+cvs co Geometry/RPCGeometry
+#cvs co -r V04-02-04  DQM/RPCMonitorModule
+cvs co -r First_Runs_CRAFT09 DQM/RPCMonitorModule
+scramv1 b 
+
+
+cd /tmp/${me}/----RUN-NUMBER----/----RELEASE----/src
+cp $HOME/scratch0/----RUN-NUMBER----/python/----input_file---- /tmp/${me}/----RUN-NUMBER----/----RELEASE----/src
+
+EdmPluginRefresh
+
+rm ----input_file----.out
+cmsRun ----input_file---- > ----input_file----.out
+cmsStageOut ----input_file----.out /store/caf/user/ccmuon/RPC/GlobalRuns/----DATASET----/----RUN-NUMBER----/out/
+cmsStageOut ----output_file---- /store/caf/user/ccmuon/RPC/GlobalRuns/----DATASET----/----RUN-NUMBER----/root/
+rfchmod +777  /castor/cern.ch/cms/store/caf/user/ccmuon/RPC/GlobalRuns/----DATASET----/----RUN-NUMBER----/root/----output_file----
+
+exit 0

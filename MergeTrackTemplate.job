@@ -1,0 +1,23 @@
+#!/bin/tcsh -x
+
+source $VO_CMS_SW_DIR/cmsset_default.csh
+setenv me `whoami`
+cd /tmp/${me}/
+mkdir ----RUN-NUMBER----
+cd ----RUN-NUMBER----
+project CMSSW
+cmsrel CMSSW_2_2_9
+cd CMSSW_2_2_9/src
+eval `scramv1 ru -csh` 
+cd /tmp/${me}/----RUN-NUMBER----/CMSSW_2_2_9/src
+EdmPluginRefresh
+setenv STAGE_SVCCLASS cmscaf
+cd /tmp/${me}/
+root -b << EOF 
+   TChain ch("theTreeExtrapolationParam");
+   TChain ch1("theTreeGlobalParam");
+   TChain ch2("theTreeGlobalTrackParam"); 
+   TChain ch3("theTreeLocalParam");
+
+
+ 

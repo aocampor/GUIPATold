@@ -1,0 +1,44 @@
+#!/bin/tcsh -x
+
+### Set CMSSW environment ###
+
+
+## generic ##
+# if ( ! ${?VO_CMS_SW_DIR} ) then
+#   setenv VO_CMS_SW_DIR /afs/cern.ch/cms/sw
+# endif
+source $VO_CMS_SW_DIR/cmsset_default.csh
+
+## CVS ##
+# alias cmscvsroot 'source $CMS_PATH/utils/cmscvsroot.csh'
+# alias project 'source $CMS_PATH/utils/projch.csh'
+# cmscvsroot CMSSW
+
+set me = `whoami`
+
+cd /tmp/${me}/
+mkdir ----RUN-NUMBER----
+cd ----RUN-NUMBER----
+project CMSSW
+cmsrel ----RELEASE----
+cd ----RELEASE----/src
+mkdir Noise
+cp -r ~aocampor/public/MyEff Noise/
+cd Noise/
+eval `scramv1 runtime -csh`
+scramv1 b
+cd ..
+
+
+cd /tmp/${me}/----RUN-NUMBER----/----RELEASE----/src
+cp $HOME/scratch0/----RUN-NUMBER----/python/----input_file---- /tmp/${me}/----RUN-NUMBER----/----RELEASE----/src
+
+EdmPluginRefresh
+setenv STAGE_SVCCLASS cmscaf
+
+rm ----input_file----.out
+cmsRun ----input_file---- > ----input_file----.out
+rfcp ----input_file----.out /castor/cern.ch/cms/store/caf/user/ccmuon/RPC/GlobalRuns/----DATASET----/----RUN-NUMBER----/out/
+rfcp ----output_file1---- /castor/cern.ch/cms/store/caf/user/ccmuon/RPC/GlobalRuns/----DATASET----/----RUN-NUMBER----/root/
+
+exit 0
